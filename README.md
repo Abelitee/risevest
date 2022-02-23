@@ -2,7 +2,6 @@
 
 ## 📖 Getting started
 ![screenshot](https://user-images.githubusercontent.com/49671278/155411217-71f7c41a-fd58-4694-b3a4-925459296a13.jpg)
-![screenshot2](https://user-images.githubusercontent.com/49671278/155411229-d140a6cf-9e2f-487d-ad17-c9205d866918.jpg)
 
 
 download Exported Apk:
