@@ -2,18 +2,17 @@ import { StatusBar } from "expo-status-bar";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { QueryClient, QueryClientProvider } from "react-query";
 import Toast from "react-native-toast-message";
-import {toastConfig} from "./components/ToastMsg"
-
+import { toastConfig } from "./components/ToastMsg";
 
 import useCachedResources from "./hooks/useCachedResources";
 import useColorScheme from "./hooks/useColorScheme";
 import Navigation from "./navigation";
 
-
 const queryClient = new QueryClient();
 
 export default function App() {
-  const isLoadingComplete = useCachedResources();
+  const { isLoadingComplete, onBoardingStatus, tokenStatus } =
+    useCachedResources();
   const colorScheme = useColorScheme();
 
   if (!isLoadingComplete) {
@@ -22,7 +21,11 @@ export default function App() {
     return (
       <QueryClientProvider client={queryClient}>
         <SafeAreaProvider>
-          <Navigation colorScheme={colorScheme} />
+          <Navigation
+            colorScheme={colorScheme}
+            onboarding={onBoardingStatus}
+            token={tokenStatus}
+          />
           <StatusBar />
           <Toast config={toastConfig} />
         </SafeAreaProvider>

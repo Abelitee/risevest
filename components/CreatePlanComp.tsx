@@ -136,7 +136,7 @@ export function PlanInfo({ navigation }: PlanStackScreenProps<"PlanInfo">) {
           color={color.primary}
           unfilledColor="rgba(113,135,156,0.1)"
           borderWidth={0}
-          height={wp(2.6)}
+          height={wp(2)}
           borderRadius={wp(4)}
         />
       </View>

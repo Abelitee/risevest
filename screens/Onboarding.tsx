@@ -1,15 +1,13 @@
 import React, { useState, useRef } from "react";
-
-import { StyleSheet, Image, TouchableOpacity } from "react-native";
+import { StyleSheet, TouchableOpacity } from "react-native";
 import { Text, View } from "../components/Themed";
 import Carousel, { Pagination } from "react-native-snap-carousel";
-
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import { Ionicons as Icon } from "@expo/vector-icons";
 import tw from "twrnc";
 import { BoardValues } from "../static/onboarding";
-import { Color } from "react-native-svg";
 import { RootStackScreenProps } from "../types";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function OnboardingScreen({
   navigation,
@@ -18,81 +16,37 @@ export default function OnboardingScreen({
 
   const ref = useRef<Carousel<number>>(null);
 
+  const color =
+    active === 0
+      ? "#FE7122"
+      : active === 1
+      ? "#B80074"
+      : active === 2
+      ? "#0898A0"
+      : "#0898A0";
+
+  async function handleNav(value: any) {
+    await AsyncStorage.setItem("onboarding", "true");
+    navigation.navigate(value);
+  }
+
   const RenderComp: React.FC<{ item: any; index: number }> = ({
     item,
     index,
   }) => {
-    function handleNav(value: any) {
-      navigation.navigate(value);
-    }
     return (
       <View style={[[styles.renderBox], { backgroundColor: item.bg }]}>
-        <View style={[tw`bg-transparent items-center mt-10 `, {maxHeight: wp(70)}]}>
-          <item.img maxHeight={wp(60)}  maxWidth={wp(60)} />
-
-          <Dots color={item.color} />
+        <View style={[tw`bg-transparent items-center mt-10 mb-20 `]}>
+          <item.img maxHeight={wp(60)} maxWidth={wp(60)} />
         </View>
 
-        <View style={tw`bg-transparent`}>
+        <View style={tw`bg-transparent mt-15`}>
           <Text style={[styles.title, { color: item.color }]}>
             {item.title}
           </Text>
 
           <Text style={styles.sub}>{item.sub}</Text>
         </View>
-
-        {index !== 2 ? (
-          <View style={styles.base}>
-            <TouchableOpacity
-              style={styles.back}
-              disabled={index === 0 ? true : false}
-              onPress={() => {
-                index !== 0 && ref.current?.snapToItem(0);
-              }}
-            >
-              <Icon
-                name="arrow-back"
-                size={wp(6)}
-                color={index !== 0 ? item.color : "#94A1AD"}
-              />
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.nextBtn}
-              onPress={() => {
-                ref.current?.snapToItem(index + 1);
-              }}
-            >
-              <Text style={[styles.next, { color: item.color }]}>Next</Text>
-
-              <Icon name="arrow-forward" size={wp(6)} color={item.color} />
-            </TouchableOpacity>
-          </View>
-        ) : (
-          <View>
-            <TouchableOpacity
-              style={styles.signUp}
-              onPress={() => {
-                handleNav("SignUp");
-              }}
-            >
-              <Text style={[styles.authTitle, { color: "white" }]}>
-                Sign Up
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.signIn}
-              onPress={() => {
-                handleNav("SignIn");
-              }}
-            >
-              <Text style={[styles.authTitle, { color: "#0898A0" }]}>
-                Sign In
-              </Text>
-            </TouchableOpacity>
-          </View>
-        )}
       </View>
     );
   };
@@ -132,10 +86,70 @@ export default function OnboardingScreen({
         renderItem={RenderComp}
         sliderWidth={wp(100)}
         itemWidth={wp(100)}
-        onSnapToItem={(idx) => {
+        inactiveSlideScale={1}
+        onBeforeSnapToItem={(idx) => {
           setActive(idx);
         }}
       />
+
+      <View style={tw`absolute top-90 left-40 bg-transparent`}>
+        <Dots color={color} />
+      </View>
+
+      <View style={tw`absolute bottom-30 px-5 bg-transparent w-100`}>
+        {active !== 2 ? (
+          <View style={styles.base}>
+            <TouchableOpacity
+              style={styles.back}
+              disabled={active === 0 ? true : false}
+              onPress={() => {
+                active !== 0 && ref.current?.snapToItem(0);
+              }}
+            >
+              <Icon
+                name="arrow-back"
+                size={wp(6)}
+                color={active !== 0 ? color : "#94A1AD"}
+              />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.nextBtn}
+              onPress={() => {
+                ref.current?.snapToItem(active + 1);
+              }}
+            >
+              <Text style={[styles.next, { color: color }]}>Next</Text>
+
+              <Icon name="arrow-forward" size={wp(6)} color={color} />
+            </TouchableOpacity>
+          </View>
+        ) : (
+          <View>
+            <TouchableOpacity
+              style={styles.signUp}
+              onPress={() => {
+                handleNav("SignUp");
+              }}
+            >
+              <Text style={[styles.authTitle, { color: "white" }]}>
+                Sign Up
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.signIn}
+              onPress={() => {
+                handleNav("SignIn");
+              }}
+            >
+              <Text style={[styles.authTitle, { color: "#0898A0" }]}>
+                Sign In
+              </Text>
+            </TouchableOpacity>
+          </View>
+        )}
+      </View>
     </View>
   );
 }
@@ -155,7 +169,7 @@ const styles = StyleSheet.create({
   },
   renderBox: {
     flex: 1,
-    justifyContent: "space-around",
+    // justifyContent: "center",
     paddingBottom: wp(8),
     paddingHorizontal: wp(5),
   },

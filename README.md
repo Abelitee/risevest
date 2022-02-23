@@ -2,6 +2,11 @@
 
 ## 📖 Getting started
 
+download Exported Apk:
+```
+https://docs.google.com/uc?export=download&id=1h8DQbM1Xcoo4AZyicSvXXLOjO7shHndy
+```
+
 1. Clone Repo:
 ```
 https://github.com/Abelitee/risevest.git

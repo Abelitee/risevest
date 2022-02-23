@@ -23,9 +23,9 @@ export type RootStackParamList = {
   Onboarding: undefined;
   SignUp: NavigatorScreenParams<SignUpParamList> | undefined;
   SignIn: undefined;
-  CreatePlan: NavigatorScreenParams<PlanParamList> | undefined;
+  Plan: NavigatorScreenParams<PlanParamList> | undefined;
   SuccessModal: {
-    action: Function;
+    nextScreen: keyof RootStackParamList;
     title?: string;
     sub?: string;
     btnTitle?: string;
@@ -70,7 +70,10 @@ export type PlanStackScreenProps<Screen extends keyof PlanParamList> =
   >;
 
 export type PlanParamList = {
-  PlanScreen: undefined;
+  PlanScreen: {
+    planId: string;
+  };
+  CreatePlan: undefined;
   PlanInfo: undefined;
   PlanReview: {
     planName?: string;

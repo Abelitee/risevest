@@ -25,7 +25,6 @@ import TabOneScreen from "../screens/TabOneScreen";
 import TabTwoScreen from "../screens/TabTwoScreen";
 
 import HomeIcon from "../assets/images/home.svg";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import {
   PlanParamList,
@@ -38,23 +37,30 @@ import LinkingConfiguration from "./LinkingConfiguration";
 import { SignUpInfo } from "../components/SignupComp";
 import SignIn from "../screens/SIgnin";
 import Home from "../screens/Home";
-import { PlanScreen } from "../screens/CreatePlan";
+import { CreatePlan } from "../screens/CreatePlan";
 import { PlanInfo, PlanReview } from "../components/CreatePlanComp";
 import SuccessModal from "../components/SuccessModal";
 import { View } from "../components/Themed";
 import tw from "twrnc";
+import { PlanScreen } from "../screens/Plan";
+
+interface NavigationNode {
+  colorScheme: ColorSchemeName;
+  onboarding: boolean;
+  token: boolean;
+}
 
 export default function Navigation({
   colorScheme,
-}: {
-  colorScheme: ColorSchemeName;
-}) {
+  token,
+  onboarding,
+}: NavigationNode) {
   return (
     <NavigationContainer
       linking={LinkingConfiguration}
       theme={colorScheme === "dark" ? DarkTheme : DefaultTheme}
     >
-      <RootNavigator />
+      <RootNavigator token={token} onboarding={onboarding} />
     </NavigationContainer>
   );
 }
@@ -65,11 +71,20 @@ export default function Navigation({
  */
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
-function RootNavigator() {
+function RootNavigator({
+  onboarding,
+  token,
+}: {
+  onboarding: boolean;
+  token: boolean;
+}) {
   const colorScheme = useColorScheme();
+
+  const defaultRoute = !onboarding ? "Onboarding" : !token ? "SignIn" : "Root";
 
   return (
     <Stack.Navigator
+      initialRouteName={defaultRoute}
       screenOptions={{
         headerShown: false,
         contentStyle: {
@@ -78,22 +93,13 @@ function RootNavigator() {
         },
       }}
     >
+      <Stack.Screen name="Root" component={BottomTabNavigator} />
+
       <Stack.Screen name="Onboarding" component={OnboardingScreen} />
-      <Stack.Screen
-        name="Root"
-        component={BottomTabNavigator}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="CreatePlan"
-        component={PlanNavigator}
-        options={{
-          presentation: "modal",
-        }}
-      />
+
+      <Stack.Screen name="Plan" component={PlanNavigator} />
 
       <Stack.Screen name="SignIn" component={SignIn} />
-
 
       <Stack.Screen name="SignUp" component={SignUpNavigator} />
 
@@ -149,9 +155,17 @@ function PlanNavigator() {
         },
       }}
     >
-      <PlanStack.Screen name="PlanInfo" component={PlanInfo} />
-      <PlanStack.Screen name="PlanReview" component={PlanReview} />
       <PlanStack.Screen name="PlanScreen" component={PlanScreen} />
+
+      <Stack.Group screenOptions={{ presentation: "modal" }}>
+        <PlanStack.Screen
+          name="CreatePlan"
+          component={CreatePlan}
+          options={{ presentation: "modal" }}
+        />
+        <PlanStack.Screen name="PlanInfo" component={PlanInfo} />
+        <PlanStack.Screen name="PlanReview" component={PlanReview} />
+      </Stack.Group>
     </PlanStack.Navigator>
   );
 }
@@ -182,39 +196,6 @@ function BottomTabNavigator() {
           tabBarShowLabel: false,
         }}
       />
-
-      {/* <BottomTab.Screen
-        name="TabOne"
-        component={TabOneScreen}
-        options={({ navigation }: RootTabScreenProps<"TabOne">) => ({
-          title: "Tab One",
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
-          headerRight: () => (
-            <Pressable
-              onPress={() => navigation.navigate("Modal")}
-              style={({ pressed }) => ({
-                opacity: pressed ? 0.5 : 1,
-              })}
-            >
-              <FontAwesome
-                name="info-circle"
-                size={25}
-                color={Colors[colorScheme].text}
-                style={{ marginRight: 15 }}
-              />
-            </Pressable>
-          ),
-        })}
-      /> */}
-
-      {/* <BottomTab.Screen
-        name="TabTwo"
-        component={TabTwoScreen}
-        options={{
-          title: "Tab Two",
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
-        }}
-      /> */}
     </BottomTab.Navigator>
   );
 }
@@ -234,15 +215,3 @@ function TabBarIcon(props: {
     </View>
   );
 }
-
-export const getData = async (name: string) => {
-  try {
-    const value = await AsyncStorage.getItem(name);
-    const jsonValue = value ? JSON.parse(value) : null;
-
-    return jsonValue;
-  } catch (e) {
-    console.log(e);
-    console.error("shit could not be read");
-  }
-};

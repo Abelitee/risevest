@@ -31,6 +31,8 @@ import { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
 import { useGet } from "../services/queries";
 import { ErrorComp } from "./ErrorComp";
 import Carousel, { Pagination } from "react-native-snap-carousel";
+import { useRefreshOnFocus } from "../hooks/useRefrestOnFocus";
+import { useRefreshByUser } from "../hooks/useRefreshByUser";
 
 interface BalanceNode {
   amount?: number;
@@ -50,10 +52,13 @@ export function Balance({ amount }: BalanceNode) {
 
   const color = Colors[colorScheme];
 
-  const { isLoading, isError, data, error, refetch } = useGet({
+  const { isLoading, isError, data, error, refetch, isRefetching } = useGet({
     url: "/sessions",
     id: "sessions",
+    options: { staleTime: 40 },
   });
+
+  useRefreshOnFocus(refetch);
 
   if (isLoading) {
     return <BalanceLoader />;
@@ -289,8 +294,17 @@ export function PlanCard({ navigation }: PlanNode) {
     id: "plans",
   });
 
-  function handlePlan() {
-    navigation.navigate("CreatePlan");
+  useRefreshOnFocus(refetch);
+
+  function handlePlan(value: any) {
+    navigation.navigate("Plan", {
+      screen: "PlanScreen",
+      params: { planId: value.id },
+    });
+  }
+
+  function handlePlanCreation() {
+    navigation.navigate("Plan", { screen: "CreatePlan" });
   }
 
   if (isLoading) {
@@ -328,7 +342,7 @@ export function PlanCard({ navigation }: PlanNode) {
           style={tw`justify-center items-center p-7 mr-5 rounded-xl bg-[rgba(113,135,156,0.1)] h-[${wp(
             19
           )}] w-[${wp(12)}]`}
-          onPress={handlePlan}
+          onPress={handlePlanCreation}
         >
           <Add />
 
@@ -342,22 +356,27 @@ export function PlanCard({ navigation }: PlanNode) {
           </Text>
         </TouchableOpacity>
 
-        {data.items?.map((value: undefined, index: React.Key) => {
+        {data.items?.map((value: any, index: React.Key) => {
           return (
             <TouchableOpacity
-              style={tw`bg-red-800 rounded-xl h-[${wp(19)}] w-[${wp(
-                12
-              )}] overflow-hidden shadow-xl mr-4`}
+              style={tw`bg-[rgba(113,135,156,0.1)] rounded-xl h-[${wp(
+                19
+              )}] w-[${wp(12)}] overflow-hidden shadow-xl mr-4`}
               key={index}
+              onPress={() => {
+                handlePlan(value);
+              }}
             >
               <ImageBackground
                 source={require("../assets/images/coin.png")}
                 style={tw`flex-1 p-5 flex-col-reverse`}
               >
                 <View style={tw`shadow-2xl bg-transparent`}>
-                  <Text style={tw`text-lg text-white`}>Build Wealth</Text>
+                  <Text style={tw`text-lg text-white capitalize`}>
+                    {value.plan_name}
+                  </Text>
                   <Text style={tw`text-2xl leading-1.1 text-white `}>
-                    $188.25
+                    $ {value.invested_amount}
                   </Text>
                   <Text style={tw`text-lg leading-1.1 text-white `}>
                     Mixed assets

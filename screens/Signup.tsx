@@ -14,6 +14,8 @@ import { Ionicons as Icon } from "@expo/vector-icons";
 import tw from "twrnc";
 import TextField from "../components/Textfield";
 import { inputChecker } from "../static/signup";
+import useColorScheme from "../hooks/useColorScheme";
+import Colors from "../constants/Colors";
 
 export default function SignUpScreen({
   navigation,
@@ -23,16 +25,21 @@ export default function SignUpScreen({
   const [password, setPassword] = useState("");
   const [isSecure, setIsSecure] = useState(true);
 
-
-
   const passReg = new RegExp("^(?=.*[A-Z])(?=.*?[#?!@$%^&*-]).{8,}$");
 
   const passResult = passReg.test(password);
 
   const passRef = useRef<TextInput>(null);
+  const colorScheme = useColorScheme();
+
+  const color = Colors[colorScheme];
 
   function handleNav() {
     navigation.navigate("SignUpInfo", { email, password });
+  }
+
+  function handleSignIn() {
+    navigation.navigate("SignIn")
   }
 
   return (
@@ -108,6 +115,13 @@ export default function SignUpScreen({
           <Text style={[styles.btnText, { color: "white" }]}>Sign Up</Text>
         </TouchableOpacity>
       </View>
+
+      <TouchableOpacity onPress={handleSignIn}>
+        <Text style={styles.altText}>
+          Already have an account?{" "}
+          <Text style={tw`text-[${color.primary}] text-base`}>Sign In</Text>
+        </Text>
+      </TouchableOpacity>
     </ScrollView>
   );
 }
@@ -154,5 +168,12 @@ const styles = StyleSheet.create({
   btnText: {
     fontSize: wp(4),
     fontFamily: "DMB",
+  },
+  altText: {
+    fontSize: wp(3.5),
+    color: "#71879C",
+    textAlign: "center",
+    fontFamily: "DMB",
+    marginTop: wp(5),
   },
 });

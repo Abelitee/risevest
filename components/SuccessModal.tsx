@@ -11,7 +11,7 @@ export default function SuccessModal({
   navigation,
   route,
 }: RootStackScreenProps<"SuccessModal">) {
-  const { action } = route?.params;
+  const { nextScreen } = route?.params;
   return (
     <View style={styles.promptModalBg}>
       <View style={styles.promptCase}>
@@ -29,7 +29,7 @@ export default function SuccessModal({
         <TouchableOpacity
           style={[styles.promptBtn]}
           onPress={() => {
-            action();
+            navigation.replace(nextScreen);
           }}
         >
           <Text style={[styles.btnText, { color: "white" }]}>Okay</Text>

@@ -9,7 +9,7 @@ import Button from "../components/Button";
 import { planValues } from "../static/createPlan";
 import { TopNav } from "../components/TopNav";
 
-export function PlanScreen({ navigation }: PlanStackScreenProps<"PlanScreen">) {
+export function CreatePlan({ navigation }: PlanStackScreenProps<"CreatePlan">) {
   function handleNext() {
     navigation.navigate("PlanInfo");
   }

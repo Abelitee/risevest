@@ -24,7 +24,7 @@ const Button: React.FC<Props> = (props) => {
   return (
     <TouchableOpacity style={[styles.btn, style]} {...restOfProps}>
       {isLoading ? (
-        <BarIndicator color="white" size={wp(5.7)} count={5} style={tw`my-2.5`} />
+        <BarIndicator color="white" size={wp(5.5)} count={5}  />
       ) : (
         <Text
           style={{

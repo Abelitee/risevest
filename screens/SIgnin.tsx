@@ -16,6 +16,8 @@ import TextField from "../components/Textfield";
 import { usePost } from "../services/queries";
 import Button from "../components/Button";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import useColorScheme from "../hooks/useColorScheme";
+import Colors from "../constants/Colors";
 
 export default function SignIn({ navigation }: RootStackScreenProps<"SignIn">) {
   // states
@@ -24,6 +26,9 @@ export default function SignIn({ navigation }: RootStackScreenProps<"SignIn">) {
   const [isSecure, setIsSecure] = useState(true);
 
   const passRef = useRef<TextInput>(null);
+  const colorScheme = useColorScheme();
+
+  const color = Colors[colorScheme];
 
   async function handleSuccess(data: any) {
     const jsonValue = JSON.stringify(data);
@@ -43,6 +48,10 @@ export default function SignIn({ navigation }: RootStackScreenProps<"SignIn">) {
       });
 
     toast();
+  }
+
+  function handleSignUp() {
+    navigation.replace("SignUp");
   }
 
   const { isLoading, mutate: handleLogin } = usePost({
@@ -103,6 +112,9 @@ export default function SignIn({ navigation }: RootStackScreenProps<"SignIn">) {
             onChangeText={(text) => {
               setPassword(text);
             }}
+            onSubmitEditing={() => {
+              handleLogin();
+            }}
           />
         </View>
 
@@ -121,9 +133,12 @@ export default function SignIn({ navigation }: RootStackScreenProps<"SignIn">) {
         </View>
       </View>
 
-      <View style={styles.altCase}>
-        <Text style={styles.altText}>Don't have an account? Sign up</Text>
-      </View>
+      <TouchableOpacity style={styles.altCase} onPress={handleSignUp}>
+        <Text style={styles.altText}>
+          Don't have an account?{" "}
+          <Text style={tw`text-[${color.primary}] text-base`}>Sign up</Text>
+        </Text>
+      </TouchableOpacity>
     </ScrollView>
   );
 }

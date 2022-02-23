@@ -26,6 +26,7 @@ import DateModal from "./DateModal";
 import { usePost } from "../services/queries";
 import Toast from "react-native-toast-message";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import Button from "./Button";
 
 export function SignUpInfo({
   navigation,
@@ -72,17 +73,19 @@ export function SignUpInfo({
   };
 
   async function handleSuccess(data: any) {
-    const jsonValue = JSON.stringify(data);
-    await AsyncStorage.setItem("userInfo", jsonValue);
-    await AsyncStorage.setItem("token", data?.token);
-    navigation.navigate("Root");
+    navigation.navigate("SuccessModal", {
+      btnTitle: "Okay",
+      title: "You just created your Rise account",
+      sub: "Welcome to Rise, let's take you home",
+      nextScreen: "SignIn",
+    });
   }
 
   function handleError(error: Error) {
     const toast = () =>
       Toast.show({
         type: "error",
-        text1: "Login Error",
+        text1: "SigUp Error",
         text2: error.message,
         topOffset: 50,
         visibilityTime: 5000,
@@ -97,6 +100,7 @@ export function SignUpInfo({
       first_name: firstName,
       last_name: lastName,
       email_address: email,
+      username: Nickname,
       password: password,
       date_of_birth: dateOfBirth,
       phone_number: phoneNumber,
@@ -236,14 +240,21 @@ export function SignUpInfo({
       </View>
 
       <View style={tw`mt-10`}>
-        <TouchableOpacity
-          style={[styles.btn]}
+        <Button
+          title="Sign In"
+          isLoading={isLoading}
+          style={
+            firstName && lastName && phoneNumber
+              ? tw`opacity-100`
+              : tw`opacity-50`
+          }
+          disabled={
+            firstName && lastName && phoneNumber && !isLoading ? false : true
+          }
           onPress={() => {
-            setSuccessModal(true);
+            handleSignUp();
           }}
-        >
-          <Text style={[styles.btnText, { color: "white" }]}>Continue</Text>
-        </TouchableOpacity>
+        />
       </View>
 
       <View style={tw`mb-6`}>
@@ -253,51 +264,9 @@ export function SignUpInfo({
           and <Text style={styles.terms}>Privacy Policy.</Text>
         </Text>
       </View>
-
-      <SignUpPrompt open={successModal} setOpen={setSuccessModal} />
     </ScrollView>
   );
 }
-
-// Prompt modal
-
-interface SignUpPromptModal {
-  open: boolean;
-  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-}
-
-const SignUpPrompt: React.FC<SignUpPromptModal> = ({ open, setOpen }) => {
-  const closeModal = () => {
-    setOpen(!open);
-  };
-  return (
-    <Modal animationType="slide" visible={open} onRequestClose={closeModal}>
-      <View style={styles.promptModalBg}>
-        <View style={styles.promptCase}>
-          <Success />
-
-          <Text style={styles.promptTitle}>
-            You just created your Rise account
-          </Text>
-          <Text style={styles.promptSub}>
-            Welcome to Rise, let's take you home
-          </Text>
-        </View>
-
-        <View>
-          <TouchableOpacity
-            style={[styles.promptBtn]}
-            onPress={() => {
-              closeModal();
-            }}
-          >
-            <Text style={[styles.btnText, { color: "white" }]}>Okay</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    </Modal>
-  );
-};
 
 const styles = StyleSheet.create({
   container: {

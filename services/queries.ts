@@ -6,21 +6,23 @@ import { AxiosResponse } from "axios";
 interface GetNode {
   url: string;
   id: string;
+  options?: {};
 }
 
-export function useGet({ url, id }: GetNode) {
-  const { isLoading, isSuccess, isError, data, error, refetch } = useQuery(
-    ["get", id],
-    async () => {
-      const token = await AsyncStorage.getItem("token");
+export function useGet({ url, id, options }: GetNode) {
+  const { isLoading, isSuccess, isError, data, error, refetch, isRefetching } =
+    useQuery(
+      ["get", id],
+      async () => {
+        const token = await AsyncStorage.getItem("token");
 
-      const options = {
-        headers: { Authorization: `Bearer ${token}` },
-      };
+        const properties = {
+          headers: { Authorization: `Bearer ${token}` },
+        };
 
-      return await axios.get(url, options);
-    }
-  );
+        return await axios.get(url, properties);
+      },
+    );
 
   return {
     isLoading,
@@ -29,6 +31,7 @@ export function useGet({ url, id }: GetNode) {
     data: data?.data,
     error,
     refetch,
+    isRefetching,
   };
 }
 
